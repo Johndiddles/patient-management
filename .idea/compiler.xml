@@ -11,12 +11,14 @@
         <module name="api-gateway" />
         <module name="patient-service" />
         <module name="auth-service" />
+        <module name="integration-tests" />
         <module name="billing-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="analytics-service-old" target="21" />
       <module name="apigateway" target="21" />
+      <module name="integration-tests-obsolete" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
