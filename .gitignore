@@ -1,4 +1,5 @@
 patient-service-storage/
+auth-service-storage/
 .idea/
 .idea/*
 
