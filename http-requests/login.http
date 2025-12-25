@@ -1,5 +1,5 @@
 ### POST login to get a new access token
-POST http://localhost:4004/auth/login
+POST http://lb-6a955ba8.elb.localhost.localstack.cloud:4004/auth/login
 Content-Type: application/json
 
 {
