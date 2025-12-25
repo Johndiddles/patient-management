@@ -10,7 +10,7 @@ COPY src ./src
 
 RUN mvn clean package
 
-FROM openjdk:26-ea-trixie AS runner
+FROM eclipse-temurin:21-jre-alpine-3.23 AS runner
 
 WORKDIR /app
 
