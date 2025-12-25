@@ -724,6 +724,45 @@
                       "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
                       "version": "2.178.1"
                     }
+                  },
+                  "from localstackAuthServiceSecurityGroup9EF7E86F:{IndirectPort}": {
+                    "id": "from localstackAuthServiceSecurityGroup9EF7E86F:{IndirectPort}",
+                    "path": "localstack/authServiceDb/SecurityGroup/from localstackAuthServiceSecurityGroup9EF7E86F:{IndirectPort}",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroupIngress",
+                      "aws:cdk:cloudformation:props": {
+                        "description": "from localstackAuthServiceSecurityGroup9EF7E86F:{IndirectPort}",
+                        "fromPort": {
+                          "Fn::GetAtt": [
+                            "authServiceDb020A3627",
+                            "Endpoint.Port"
+                          ]
+                        },
+                        "groupId": {
+                          "Fn::GetAtt": [
+                            "authServiceDbSecurityGroup3A3DD655",
+                            "GroupId"
+                          ]
+                        },
+                        "ipProtocol": "tcp",
+                        "sourceSecurityGroupId": {
+                          "Fn::GetAtt": [
+                            "AuthServiceSecurityGroup67F2FA7D",
+                            "GroupId"
+                          ]
+                        },
+                        "toPort": {
+                          "Fn::GetAtt": [
+                            "authServiceDb020A3627",
+                            "Endpoint.Port"
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroupIngress",
+                      "version": "2.178.1"
+                    }
                   }
                 },
                 "constructInfo": {
@@ -812,13 +851,13 @@
                   "aws:cdk:cloudformation:props": {
                     "allocatedStorage": "20",
                     "copyTagsToSnapshot": true,
-                    "dbInstanceClass": "db.t2.micro",
+                    "dbInstanceClass": "db.t3.micro",
                     "dbName": "auth-service-db",
                     "dbSubnetGroupName": {
                       "Ref": "authServiceDbSubnetGroupD5ABD0F7"
                     },
                     "engine": "postgres",
-                    "engineVersion": "17.2",
+                    "engineVersion": "15.4",
                     "masterUsername": "admin_user",
                     "masterUserPassword": {
                       "Fn::Join": [
@@ -919,6 +958,45 @@
                       "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
                       "version": "2.178.1"
                     }
+                  },
+                  "from localstackPatientServiceSecurityGroupE7BD978F:{IndirectPort}": {
+                    "id": "from localstackPatientServiceSecurityGroupE7BD978F:{IndirectPort}",
+                    "path": "localstack/patientServiceDB/SecurityGroup/from localstackPatientServiceSecurityGroupE7BD978F:{IndirectPort}",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroupIngress",
+                      "aws:cdk:cloudformation:props": {
+                        "description": "from localstackPatientServiceSecurityGroupE7BD978F:{IndirectPort}",
+                        "fromPort": {
+                          "Fn::GetAtt": [
+                            "patientServiceDBFD309E6E",
+                            "Endpoint.Port"
+                          ]
+                        },
+                        "groupId": {
+                          "Fn::GetAtt": [
+                            "patientServiceDBSecurityGroupBFE885B4",
+                            "GroupId"
+                          ]
+                        },
+                        "ipProtocol": "tcp",
+                        "sourceSecurityGroupId": {
+                          "Fn::GetAtt": [
+                            "PatientServiceSecurityGroup547BE1F2",
+                            "GroupId"
+                          ]
+                        },
+                        "toPort": {
+                          "Fn::GetAtt": [
+                            "patientServiceDBFD309E6E",
+                            "Endpoint.Port"
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroupIngress",
+                      "version": "2.178.1"
+                    }
                   }
                 },
                 "constructInfo": {
@@ -1007,13 +1085,13 @@
                   "aws:cdk:cloudformation:props": {
                     "allocatedStorage": "20",
                     "copyTagsToSnapshot": true,
-                    "dbInstanceClass": "db.t2.micro",
+                    "dbInstanceClass": "db.t3.micro",
                     "dbName": "patient-service-db",
                     "dbSubnetGroupName": {
                       "Ref": "patientServiceDBSubnetGroup319304A7"
                     },
                     "engine": "postgres",
-                    "engineVersion": "17.2",
+                    "engineVersion": "15.4",
                     "masterUsername": "admin_user",
                     "masterUserPassword": {
                       "Fn::Join": [
@@ -1129,8 +1207,8 @@
                   "brokerAzDistribution": "DEFAULT"
                 },
                 "clusterName": "kafka-cluster",
-                "kafkaVersion": "",
-                "numberOfBrokerNodes": 1
+                "kafkaVersion": "3.6.0",
+                "numberOfBrokerNodes": 2
               }
             },
             "constructInfo": {
@@ -1290,6 +1368,7 @@
                                       "Endpoint.Address"
                                     ]
                                   },
+                                  ":",
                                   {
                                     "Fn::GetAtt": [
                                       "authServiceDb020A3627",
@@ -2389,6 +2468,7 @@
                                       "Endpoint.Address"
                                     ]
                                   },
+                                  ":",
                                   {
                                     "Fn::GetAtt": [
                                       "patientServiceDBFD309E6E",
@@ -2433,7 +2513,7 @@
                           },
                           {
                             "name": "BILLING_SERVICE_ADDRESS",
-                            "value": "host.docker.internal"
+                            "value": "billing-service.patient-management.local"
                           }
                         ]
                       }
@@ -2777,12 +2857,12 @@
                         },
                         "environment": [
                           {
-                            "name": "AUTH_SERVICE_URL",
-                            "value": "http://host.docker.internal:4005"
-                          },
-                          {
                             "name": "SPRING_PROFILES_ACTIVE",
                             "value": "prod"
+                          },
+                          {
+                            "name": "AUTH_SERVICE_URL",
+                            "value": "auth-service.patient-management.local"
                           }
                         ]
                       }

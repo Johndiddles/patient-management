@@ -421,6 +421,37 @@
     }
    }
   },
+  "authServiceDbSecurityGroupfromlocalstackAuthServiceSecurityGroup9EF7E86FIndirectPort84E2060E": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "from localstackAuthServiceSecurityGroup9EF7E86F:{IndirectPort}",
+    "FromPort": {
+     "Fn::GetAtt": [
+      "authServiceDb020A3627",
+      "Endpoint.Port"
+     ]
+    },
+    "GroupId": {
+     "Fn::GetAtt": [
+      "authServiceDbSecurityGroup3A3DD655",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "AuthServiceSecurityGroup67F2FA7D",
+      "GroupId"
+     ]
+    },
+    "ToPort": {
+     "Fn::GetAtt": [
+      "authServiceDb020A3627",
+      "Endpoint.Port"
+     ]
+    }
+   }
+  },
   "localstackauthServiceDbSecret65D94FCE3fdaad7efa858a3daf9490cf0a702aeb": {
    "Type": "AWS::SecretsManager::Secret",
    "Properties": {
@@ -462,13 +493,13 @@
    "Properties": {
     "AllocatedStorage": "20",
     "CopyTagsToSnapshot": true,
-    "DBInstanceClass": "db.t2.micro",
+    "DBInstanceClass": "db.t3.micro",
     "DBName": "auth-service-db",
     "DBSubnetGroupName": {
      "Ref": "authServiceDbSubnetGroupD5ABD0F7"
     },
     "Engine": "postgres",
-    "EngineVersion": "17.2",
+    "EngineVersion": "15.4",
     "MasterUserPassword": {
      "Fn::Join": [
       "",
@@ -525,6 +556,37 @@
     }
    }
   },
+  "patientServiceDBSecurityGroupfromlocalstackPatientServiceSecurityGroupE7BD978FIndirectPort1CE799B7": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "from localstackPatientServiceSecurityGroupE7BD978F:{IndirectPort}",
+    "FromPort": {
+     "Fn::GetAtt": [
+      "patientServiceDBFD309E6E",
+      "Endpoint.Port"
+     ]
+    },
+    "GroupId": {
+     "Fn::GetAtt": [
+      "patientServiceDBSecurityGroupBFE885B4",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "PatientServiceSecurityGroup547BE1F2",
+      "GroupId"
+     ]
+    },
+    "ToPort": {
+     "Fn::GetAtt": [
+      "patientServiceDBFD309E6E",
+      "Endpoint.Port"
+     ]
+    }
+   }
+  },
   "localstackpatientServiceDBSecret210E0DDF3fdaad7efa858a3daf9490cf0a702aeb": {
    "Type": "AWS::SecretsManager::Secret",
    "Properties": {
@@ -566,13 +628,13 @@
    "Properties": {
     "AllocatedStorage": "20",
     "CopyTagsToSnapshot": true,
-    "DBInstanceClass": "db.t2.micro",
+    "DBInstanceClass": "db.t3.micro",
     "DBName": "patient-service-db",
     "DBSubnetGroupName": {
      "Ref": "patientServiceDBSubnetGroup319304A7"
     },
     "Engine": "postgres",
-    "EngineVersion": "17.2",
+    "EngineVersion": "15.4",
     "MasterUserPassword": {
      "Fn::Join": [
       "",
@@ -659,8 +721,8 @@
      "InstanceType": "kafka.m5.large"
     },
     "ClusterName": "kafka-cluster",
-    "KafkaVersion": "",
-    "NumberOfBrokerNodes": 1
+    "KafkaVersion": "3.6.0",
+    "NumberOfBrokerNodes": 2
    }
   },
   "PatientManagementCluster98E10F8D": {
@@ -719,6 +781,7 @@
              "Endpoint.Address"
             ]
            },
+           ":",
            {
             "Fn::GetAtt": [
              "authServiceDb020A3627",
@@ -909,6 +972,7 @@
     "authServiceDb020A3627",
     "authServiceDbSecretAttachmentBFF882CE",
     "localstackauthServiceDbSecret65D94FCE3fdaad7efa858a3daf9490cf0a702aeb",
+    "authServiceDbSecurityGroupfromlocalstackAuthServiceSecurityGroup9EF7E86FIndirectPort84E2060E",
     "authServiceDbSecurityGroup3A3DD655",
     "authServiceDbSubnetGroupD5ABD0F7",
     "AuthServiceDBHealthCheck",
@@ -934,6 +998,7 @@
     "authServiceDb020A3627",
     "authServiceDbSecretAttachmentBFF882CE",
     "localstackauthServiceDbSecret65D94FCE3fdaad7efa858a3daf9490cf0a702aeb",
+    "authServiceDbSecurityGroupfromlocalstackAuthServiceSecurityGroup9EF7E86FIndirectPort84E2060E",
     "authServiceDbSecurityGroup3A3DD655",
     "authServiceDbSubnetGroupD5ABD0F7",
     "AuthServiceDBHealthCheck",
@@ -1379,6 +1444,7 @@
              "Endpoint.Address"
             ]
            },
+           ":",
            {
             "Fn::GetAtt": [
              "patientServiceDBFD309E6E",
@@ -1423,7 +1489,7 @@
        },
        {
         "Name": "BILLING_SERVICE_ADDRESS",
-        "Value": "host.docker.internal"
+        "Value": "billing-service.patient-management.local"
        }
       ],
       "Essential": true,
@@ -1576,6 +1642,7 @@
     "patientServiceDBFD309E6E",
     "patientServiceDBSecretAttachmentBFD46006",
     "localstackpatientServiceDBSecret210E0DDF3fdaad7efa858a3daf9490cf0a702aeb",
+    "patientServiceDBSecurityGroupfromlocalstackPatientServiceSecurityGroupE7BD978FIndirectPort1CE799B7",
     "patientServiceDBSecurityGroupBFE885B4",
     "patientServiceDBSubnetGroup319304A7",
     "PatientServiceDBHealthCheck",
@@ -1604,6 +1671,7 @@
     "patientServiceDBFD309E6E",
     "patientServiceDBSecretAttachmentBFD46006",
     "localstackpatientServiceDBSecret210E0DDF3fdaad7efa858a3daf9490cf0a702aeb",
+    "patientServiceDBSecurityGroupfromlocalstackPatientServiceSecurityGroupE7BD978FIndirectPort1CE799B7",
     "patientServiceDBSecurityGroupBFE885B4",
     "patientServiceDBSubnetGroup319304A7",
     "PatientServiceDBHealthCheck",
@@ -1634,12 +1702,12 @@
      {
       "Environment": [
        {
-        "Name": "AUTH_SERVICE_URL",
-        "Value": "http://host.docker.internal:4005"
-       },
-       {
         "Name": "SPRING_PROFILES_ACTIVE",
         "Value": "prod"
+       },
+       {
+        "Name": "AUTH_SERVICE_URL",
+        "Value": "auth-service.patient-management.local"
        }
       ],
       "Essential": true,

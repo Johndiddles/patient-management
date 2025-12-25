@@ -39,6 +39,8 @@ public class LocalStack extends Stack {
         this.ecsCluster = createEcsCluster();
 
         FargateService authService = createFargateService("AuthService", "auth-service", List.of(4005), authServiceDb, Map.of("JWT_SECRET", "YmFsbG9vbnNvaWxwb3B1bGFybG91ZGhlYWRpbmdkb2luZ3NldHRsZXJzYm9hdHBhcGU="));
+
+        authServiceDb.getConnections().allowDefaultPortFrom(authService);
         authService.getNode().addDependency(authDBHealthCheck);
         authService.getNode().addDependency(authServiceDb);
 
@@ -48,9 +50,13 @@ public class LocalStack extends Stack {
         analyticsService.getNode().addDependency(mskCluster);
 
         FargateService patientService = createFargateService("PatientService", "patient-service", List.of(4000), patientServiceDb, Map.of(
-                "BILLING_SERVICE_ADDRESS", "host.docker.internal",
+//                "BILLING_SERVICE_ADDRESS", "host.docker.internal",
+                "BILLING_SERVICE_ADDRESS", "billing-service.patient-management.local",
                 "BILLING_SERVICE_GRPC_PORT", "9001"
         ));
+
+        patientServiceDb.getConnections().allowDefaultPortFrom(patientService);
+
         patientService.getNode().addDependency(patientServiceDb);
         patientService.getNode().addDependency(patientDBHealthCheck);
         patientService.getNode().addDependency(billingService);
@@ -69,18 +75,15 @@ public class LocalStack extends Stack {
                 .build();
     }
 
-    private DatabaseInstance createDatabase(String id, String dbName) {
-        return DatabaseInstance
-                .Builder
+    private DatabaseInstance createDatabase(String id, String dbName){
+        return DatabaseInstance.Builder
                 .create(this, id)
                 .engine(DatabaseInstanceEngine.postgres(
-                        PostgresInstanceEngineProps
-                                .builder()
-                                .version(PostgresEngineVersion.VER_17_2)
-                                .build()
-                ))
+                        PostgresInstanceEngineProps.builder()
+                                .version(PostgresEngineVersion.VER_15_4)
+                                .build()))
                 .vpc(vpc)
-                .instanceType(InstanceType.of(InstanceClass.BURSTABLE2, InstanceSize.MICRO))
+                .instanceType(InstanceType.of(InstanceClass.BURSTABLE3, InstanceSize.MICRO))
                 .allocatedStorage(20)
                 .credentials(Credentials.fromGeneratedSecret("admin_user"))
                 .databaseName(dbName)
@@ -108,8 +111,8 @@ public class LocalStack extends Stack {
     private CfnCluster createMskCluster() {
         return CfnCluster.Builder.create(this, "MskCluster")
                 .clusterName("kafka-cluster")
-                .kafkaVersion("")
-                .numberOfBrokerNodes(1)
+                .kafkaVersion("3.6.0")
+                .numberOfBrokerNodes(2)
                 .brokerNodeGroupInfo(
                         CfnCluster.BrokerNodeGroupInfoProperty.builder()
                                 .instanceType("kafka.m5.large")
@@ -182,9 +185,10 @@ public class LocalStack extends Stack {
         }
 
         if(db != null) {
-            envVars.put("SPRING_DATASOURCE_URL", "jdbc:postgresql://%s%s/%s-db".formatted(db.getDbInstanceEndpointAddress(), db.getDbInstanceEndpointPort(), imageName));
+            envVars.put("SPRING_DATASOURCE_URL", "jdbc:postgresql://%s:%s/%s-db".formatted(db.getDbInstanceEndpointAddress(), db.getDbInstanceEndpointPort(), imageName));
             envVars.put("SPRING_DATASOURCE_USERNAME", "admin_user");
             envVars.put("SPRING_DATASOURCE_PASSWORD", db.getSecret().secretValueFromJson("password").toString());
+//            envVars.put("SPRING_DATASOURCE_PASSWORD", db.getSecret().getSecretValue().unsafeUnwrap());
             envVars.put("SPRING_JPA_HIBERNATE_DDL_AUTO", "update");
             envVars.put("SPRING_SQL_INIT_MODE", "always");
             envVars.put("SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT", "60000");
@@ -211,7 +215,8 @@ public class LocalStack extends Stack {
                 .image(ContainerImage.fromRegistry("api-gateway"))
                 .environment(Map.of(
                         "SPRING_PROFILES_ACTIVE", "prod",
-                        "AUTH_SERVICE_URL", "http://host.docker.internal:4005"
+//                        "AUTH_SERVICE_URL", "http://host.docker.internal:4005"
+                        "AUTH_SERVICE_URL", "auth-service.patient-management.local"
                 ))
                 .portMappings(List.of(4004).stream()
                         .map(port -> PortMapping.builder()
